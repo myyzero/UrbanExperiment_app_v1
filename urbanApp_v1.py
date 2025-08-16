@@ -142,7 +142,7 @@ if st.session_state.demographics_done and st.session_state.trial_idx < len(st.se
 
     col1, col2 = st.columns(2)
     with col1:
-        st.image(stim["image"], use_column_width=True, caption=f"Stimulus {stim['id']}")
+        st.image(stim["image"], use_container_width=True, caption=f"Stimulus {stim['id']}")
     with col2:
         st.audio(stim["audio"])
 
@@ -223,4 +223,5 @@ if st.session_state.demographics_done and st.session_state.trial_idx >= len(st.s
     st.subheader("All done — thank you!")
     st.write("Your responses have been recorded.")
     st.write(f"Participant ID: **{st.session_state.participant_id}**")
+
 
