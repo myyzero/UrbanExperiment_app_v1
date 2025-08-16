@@ -118,7 +118,7 @@ if not st.session_state.demographics_done:
         )
         volume_self = st.slider("Volume level (self-report, 0–1)", 0.0, 1.0, 0.7, 0.01)
 
-    st.audio("calibration_tone.mp3")  # 选配：放一个简短的校准音
+    st.audio("test_5_y_1.wav")  # 选配：放一个简短的校准音
 
     disabled = not (consent and used_headphones and gender)
     if st.button("Begin trials", disabled=disabled):
@@ -223,3 +223,4 @@ if st.session_state.demographics_done and st.session_state.trial_idx >= len(st.s
     st.subheader("All done — thank you!")
     st.write("Your responses have been recorded.")
     st.write(f"Participant ID: **{st.session_state.participant_id}**")
+
