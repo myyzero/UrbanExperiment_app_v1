@@ -18,7 +18,7 @@ WORKSHEET_INDEX = 0                     # 第几个工作表（0 表示第一个
 # 刺激库：自行替换为你的图片和音频文件（放在与 app.py 同目录）
 STIMULI = [
     {"id": "S01", "image": "i_qeop_3.jpg", "audio": "a_3_garden.wav"},
-    {"id": "S02", "image": "i_qeop_2.jpg", "audio": "a_2_spring music.mp3"},
+    {"id": "S02", "image": "i_qeop_2.jpg", "audio": "a_2_spring music.wav"},
     #{"id": "S03", "image": "img_highway.jpg", "audio": "snd_highway.mp3"},
 ]
 
@@ -223,6 +223,7 @@ if st.session_state.demographics_done and st.session_state.trial_idx >= len(st.s
     st.subheader("All done — thank you!")
     st.write("Your responses have been recorded.")
     st.write(f"Participant ID: **{st.session_state.participant_id}**")
+
 
 
 
