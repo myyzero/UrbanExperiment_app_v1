@@ -167,7 +167,8 @@ if st.session_state.demographics_done and st.session_state.trial_idx < len(st.se
         )
 
         # 仅在 ready 时允许提交
-        submitted = st.form_submit_button("Submit this trial", disabled=not ready)
+        # submitted = st.form_submit_button("Submit this trial", disabled=not ready)
+        submitted = st.form_submit_button("Submit this trial")
 
     if submitted:
         # 粗略反应时：从“允许作答”到提交
@@ -223,6 +224,7 @@ if st.session_state.demographics_done and st.session_state.trial_idx >= len(st.s
     st.subheader("All done — thank you!")
     st.write("Your responses have been recorded.")
     st.write(f"Participant ID: **{st.session_state.participant_id}**")
+
 
 
 
