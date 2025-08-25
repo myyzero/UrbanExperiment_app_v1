@@ -110,14 +110,16 @@ if not st.session_state.demographics_done:
     colA, colB = st.columns(2)
     with colA:
         age = st.number_input("Age", min_value=18, max_value=100, step=1, value=25)
-        used_headphones = st.selectbox("Are you using headphones?", ["", "Yes", "No"])
+        # used_headphones = st.selectbox("Are you using headphones?", ["", "Yes", "No"])
     with colB:
         gender = st.selectbox(
             "Gender",
             ["", "Female", "Male", "Non-binary", "Prefer not to say", "Other"]
         )
-        volume_self = st.slider("Volume level (self-report, 0–1)", 0.0, 1.0, 0.7, 0.01)
-
+        # volume_self = st.slider("Volume level (self-report, 0–1)", 0.0, 1.0, 0.7, 0.01)
+    st.write(
+        "Please put on your headphones and listen to the test audio. Adjust the volume to a level that is clear but not uncomfortable, and do not change the volume during the rest of the trials."
+    )
     st.audio("t_pinknoise.wav")  # 选配：放一个简短的校准音
 
     disabled = not (consent and used_headphones and gender)
@@ -126,8 +128,8 @@ if not st.session_state.demographics_done:
         st.session_state.base_info = {
             "age": int(age),
             "gender": gender,
-            "used_headphones": 1 if used_headphones == "Yes" else 0,
-            "volume_selfreport": float(volume_self),
+            # "used_headphones": 1 if used_headphones == "Yes" else 0,
+            # "volume_selfreport": float(volume_self),
         }
         st.session_state.demographics_done = True
         st.rerun()
@@ -192,8 +194,8 @@ if st.session_state.demographics_done and st.session_state.trial_idx < len(st.se
             stim["audio"],
             st.session_state.base_info["age"],
             st.session_state.base_info["gender"],
-            st.session_state.base_info["used_headphones"],
-            st.session_state.base_info["volume_selfreport"],
+            # st.session_state.base_info["used_headphones"],
+            # st.session_state.base_info["volume_selfreport"],
             float(comfort),
             float(pleasantness),
             float(match),
@@ -224,6 +226,7 @@ if st.session_state.demographics_done and st.session_state.trial_idx >= len(st.s
     st.subheader("All done — thank you!")
     st.write("Your responses have been recorded.")
     st.write(f"Participant ID: **{st.session_state.participant_id}**")
+
 
 
 
