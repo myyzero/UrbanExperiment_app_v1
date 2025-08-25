@@ -122,7 +122,7 @@ if not st.session_state.demographics_done:
     )
     st.audio("t_pinknoise.wav")  # 选配：放一个简短的校准音
 
-    disabled = not (consent and used_headphones and gender)
+    disabled = not (consent and gender)
     if st.button("Begin trials", disabled=disabled):
         # 把这些基础信息存住（每个 trial 都会用到）
         st.session_state.base_info = {
@@ -226,6 +226,7 @@ if st.session_state.demographics_done and st.session_state.trial_idx >= len(st.s
     st.subheader("All done — thank you!")
     st.write("Your responses have been recorded.")
     st.write(f"Participant ID: **{st.session_state.participant_id}**")
+
 
 
 
