@@ -159,9 +159,9 @@ if st.session_state.demographics_done and st.session_state.trial_idx < len(st.se
         st.progress(min(1.0, elapsed / MIN_LISTEN_SECONDS))
 
     with st.form(key=f"form_trial_{i}"):
-        comfort = st.slider("Environmental comfort (0–1)", 0.0, 1.0, 0.5, 0.01)
+        comfort = st.slider("Acoustic comfort (0–1)", 0.0, 1.0, 0.5, 0.01)
         pleasantness = st.slider("Pleasantness (0–1)", 0.0, 1.0, 0.5, 0.01)
-        match = st.slider("Image–soundscape matching (0–1)", 0.0, 1.0, 0.5, 0.01)
+        match = st.slider("Soundscape Appropriateness (0–1)", 0.0, 1.0, 0.5, 0.01)
 
         sound_types = st.multiselect(
             "Which sound source types did you hear?",
@@ -226,6 +226,7 @@ if st.session_state.demographics_done and st.session_state.trial_idx >= len(st.s
     st.subheader("All done — thank you!")
     st.write("Your responses have been recorded.")
     st.write(f"Participant ID: **{st.session_state.participant_id}**")
+
 
 
 
