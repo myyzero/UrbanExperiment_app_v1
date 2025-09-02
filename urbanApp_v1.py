@@ -147,7 +147,11 @@ if st.session_state.demographics_done and st.session_state.trial_idx < len(st.se
     st.markdown("Acoustic comfort (0.00–1.00)")
     st.caption("What's your overall impression after viewing the image and listening to the sound?")
     comfort = st.slider("", 0.0, 1.0, 0.5, 0.01, key=f"comfort_{i}")
-    pleasantness = st.slider("Pleasantness (0.00–1.00)\n:gray[How you feel at this moment?]", 0.0, 1.0, 0.5, 0.01, key=f"pleasantness_{i}")
+    st.markdown("Pleasantness (0.00–1.00)")
+    st.caption("How you feel at this moment?")
+    pleasantness = st.slider("", 0.0, 1.0, 0.5, 0.01, key=f"pleasantness_{i}")
+    st.markdown("Soundscape Appropriateness (0.00–1.00)")
+    st.caption("Soundscape appropriateness (SA) was proposed as an indicator of whether a soundscape is suitable for a place.  \n:gray[Rated from 0.00(unsuitable) to 1.00(suitable)]")
     match = st.slider("Soundscape Appropriateness (0.00–1.00)", 0.0, 1.0, 0.5, 0.01, key=f"match_{i}")
 
     all_sound_types = [
@@ -181,9 +185,9 @@ if st.session_state.demographics_done and st.session_state.trial_idx < len(st.se
             st.session_state.form_unlocked_time = st.session_state.trial_start_time + MIN_LISTEN_SECONDS
         rt_ms = int((time.time() - st.session_state.form_unlocked_time) * 1000)
 
-        heard = {s: 99999 for s in all_sound_types}
+        heard = {s: 9 for s in all_sound_types}
         for s in sound_types:
-            heard[s] = ratings.get(s, 99999)
+            heard[s] = ratings.get(s, 9)
 
         row = [
             datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -235,6 +239,7 @@ if st.session_state.demographics_done and st.session_state.trial_idx >= len(st.s
     st.subheader("All done — thank you!")
     st.write("Your responses have been recorded.")
     st.write(f"Participant ID: **{st.session_state.participant_id}**")
+
 
 
 
