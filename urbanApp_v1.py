@@ -87,7 +87,7 @@ init_state()
 ws = open_worksheet()
 
 # ------------------- UI：标题 -------------------
-st.title("Urban Soundscape & Visual Comfort Study")
+st.title("Urban Acoustic Comfort Study")
 st.caption("Please wear headphones in a quiet environment.")
 
 # ---------------- Demographics（只填一次） ----------------
@@ -95,7 +95,7 @@ if not st.session_state.demographics_done:
     st.subheader("Step 1: Consent & Setup")
 
     st.write(
-        "By proceeding, you confirm you are 18+ and consent to your anonymous responses being used for research."
+        "By proceeding, you confirm you are willing to give consent to your anonymous responses being used for research."
     )
     consent = st.checkbox("I consent to participate.")
 
@@ -108,7 +108,7 @@ if not st.session_state.demographics_done:
             ["", "Female", "Male", "Non-binary", "Prefer not to say", "Other"]
         )
 
-    st.write("Please put on your headphones and listen to the test audio.")
+    st.write("Please put on your headphones and listen to the test audio and try not to adjust the volume again during the Trials.")
     st.audio("t_pinknoise.wav")
 
     disabled = not (consent and gender)
@@ -153,7 +153,7 @@ if st.session_state.demographics_done and st.session_state.trial_idx < len(st.se
         "Construction", "Music", "Other"
     ]
     sound_types = st.multiselect(
-        "Which sound source types did you hear? (Select-all-that-apply)",
+        "Which kinds of sound did you hear? (Select-all-that-apply)",
         all_sound_types,
         key=f"multiselect_{i}"
     )
@@ -163,7 +163,7 @@ if st.session_state.demographics_done and st.session_state.trial_idx < len(st.se
         st.write("Please rate your satisfaction with the selected sound(s):")
         for sound in sound_types:
             ratings[sound] = st.slider(
-                f"{sound} satisfaction",
+                f"Satisfaction of {sound} ",
                 min_value=0.0,
                 max_value=1.0,
                 value=0.5,
@@ -230,6 +230,7 @@ if st.session_state.demographics_done and st.session_state.trial_idx >= len(st.s
     st.subheader("All done — thank you!")
     st.write("Your responses have been recorded.")
     st.write(f"Participant ID: **{st.session_state.participant_id}**")
+
 
 
 
