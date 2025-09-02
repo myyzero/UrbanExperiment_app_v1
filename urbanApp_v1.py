@@ -179,9 +179,9 @@ if st.session_state.demographics_done and st.session_state.trial_idx < len(st.se
             st.session_state.form_unlocked_time = st.session_state.trial_start_time + MIN_LISTEN_SECONDS
         rt_ms = int((time.time() - st.session_state.form_unlocked_time) * 1000)
 
-        heard = {s: N for s in all_sound_types}
+        heard = {s: 99999 for s in all_sound_types}
         for s in sound_types:
-            heard[s] = ratings.get(s, N)
+            heard[s] = ratings.get(s, 99999)
 
         row = [
             datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -230,6 +230,7 @@ if st.session_state.demographics_done and st.session_state.trial_idx >= len(st.s
     st.subheader("All done — thank you!")
     st.write("Your responses have been recorded.")
     st.write(f"Participant ID: **{st.session_state.participant_id}**")
+
 
 
 
