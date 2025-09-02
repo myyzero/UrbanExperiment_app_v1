@@ -144,9 +144,9 @@ if st.session_state.demographics_done and st.session_state.trial_idx < len(st.se
         st.progress(min(1.0, elapsed / MIN_LISTEN_SECONDS))
 
     # ------------------- 打分部分 -------------------
-    comfort = st.slider("Acoustic comfort (0–1)", 0.0, 1.0, 0.5, 0.01, key=f"comfort_{i}")
-    pleasantness = st.slider("Pleasantness (0–1)", 0.0, 1.0, 0.5, 0.01, key=f"pleasantness_{i}")
-    match = st.slider("Soundscape Appropriateness (0–1)", 0.0, 1.0, 0.5, 0.01, key=f"match_{i}")
+    comfort = st.slider("Acoustic comfort (0.00–1.00)", 0.0, 1.0, 0.5, 0.01, key=f"comfort_{i}")
+    pleasantness = st.slider("Pleasantness (0.00–1.00)", 0.0, 1.0, 0.5, 0.01, key=f"pleasantness_{i}")
+    match = st.slider("Soundscape Appropriateness (0.00–1.00)", 0.0, 1.0, 0.5, 0.01, key=f"match_{i}")
 
     all_sound_types = [
         "Traffic", "Birds/Nature", "People/Talking", "Wind",
@@ -164,10 +164,10 @@ if st.session_state.demographics_done and st.session_state.trial_idx < len(st.se
         for sound in sound_types:
             ratings[sound] = st.slider(
                 f"{sound} satisfaction",
-                min_value=1,
-                max_value=5,
-                value=3,
-                step=1,
+                min_value=0,
+                max_value=1,
+                value=0.5,
+                step=0.01,
                 key=f"satisfaction_{sound}_{i}"
             )
 
@@ -179,9 +179,9 @@ if st.session_state.demographics_done and st.session_state.trial_idx < len(st.se
             st.session_state.form_unlocked_time = st.session_state.trial_start_time + MIN_LISTEN_SECONDS
         rt_ms = int((time.time() - st.session_state.form_unlocked_time) * 1000)
 
-        heard = {s: 0 for s in all_sound_types}
+        heard = {s: 9 for s in all_sound_types}
         for s in sound_types:
-            heard[s] = ratings.get(s, 0)
+            heard[s] = ratings.get(s, 9)
 
         row = [
             datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -230,3 +230,4 @@ if st.session_state.demographics_done and st.session_state.trial_idx >= len(st.s
     st.subheader("All done — thank you!")
     st.write("Your responses have been recorded.")
     st.write(f"Participant ID: **{st.session_state.participant_id}**")
+
