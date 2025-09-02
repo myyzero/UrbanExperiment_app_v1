@@ -164,8 +164,8 @@ if st.session_state.demographics_done and st.session_state.trial_idx < len(st.se
         for sound in sound_types:
             ratings[sound] = st.slider(
                 f"{sound} satisfaction",
-                min_value=0,
-                max_value=1,
+                min_value=0.0,
+                max_value=1.0,
                 value=0.5,
                 step=0.01,
                 key=f"satisfaction_{sound}_{i}"
@@ -230,4 +230,5 @@ if st.session_state.demographics_done and st.session_state.trial_idx >= len(st.s
     st.subheader("All done — thank you!")
     st.write("Your responses have been recorded.")
     st.write(f"Participant ID: **{st.session_state.participant_id}**")
+
 
