@@ -135,6 +135,7 @@ if not st.session_state.demographics_done:
         st.rerun()
 
 # ----------------- Trials 循环 -----------------
+# ----------------- Trials 循环 -----------------
 if st.session_state.demographics_done and st.session_state.trial_idx < len(st.session_state.trial_order):
 
     i = st.session_state.trial_idx
@@ -158,34 +159,33 @@ if st.session_state.demographics_done and st.session_state.trial_idx < len(st.se
         st.info(f"Please listen to the sound for at least {MIN_LISTEN_SECONDS} seconds before answering.")
         st.progress(min(1.0, elapsed / MIN_LISTEN_SECONDS))
 
-    with st.form(key=f"form_trial_{i}"):
-        comfort = st.slider("Acoustic comfort (0–1)", 0.0, 1.0, 0.5, 0.01)
-        pleasantness = st.slider("Pleasantness (0–1)", 0.0, 1.0, 0.5, 0.01)
-        match = st.slider("Soundscape Appropriateness (0–1)", 0.0, 1.0, 0.5, 0.01)
+    # ------------------- 打分部分 -------------------
+    comfort = st.slider("Acoustic comfort (0–1)", 0.0, 1.0, 0.5, 0.01)
+    pleasantness = st.slider("Pleasantness (0–1)", 0.0, 1.0, 0.5, 0.01)
+    match = st.slider("Soundscape Appropriateness (0–1)", 0.0, 1.0, 0.5, 0.01)
 
-        all_sound_types = ["Traffic", "Birds/Nature", "People/Talking", "Wind", "Construction/Mechanical", "Music", "Other"]
-        sound_types = st.multiselect(
-            "Which sound source types did you hear?", all_sound_types )
-        
+    all_sound_types = [
+        "Traffic", "Birds/Nature", "People/Talking", "Wind",
+        "Construction/Mechanical", "Music", "Other"
+    ]
+    sound_types = st.multiselect("Which sound source types did you hear?", all_sound_types)
 
-        # 根据选择的声音，动态生成对应的满意度滑块
-        ratings = {}
-        if sound_types:
-            st.write("The satisfaction of your chosen sounds：")
-            for sound in sound_types:
-                ratings[sound] = st.slider(
-                    f"{sound} satisfaction", 
-                    min_value=1, 
-                    max_value=5, 
-                    value=3, 
-                    step=1
-                )
+    # 根据选择的声音，动态生成对应的满意度滑块
+    ratings = {}
+    if sound_types:
+        st.write("Please rate your satisfaction with the selected sound(s):")
+        for sound in sound_types:
+            ratings[sound] = st.slider(
+                f"{sound} satisfaction",
+                min_value=1,
+                max_value=5,
+                value=3,
+                step=1,
+                key=f"satisfaction_{sound}_{i}"
+            )
 
-        
-
-        # 仅在 ready 时允许提交
-        # submitted = st.form_submit_button("Submit this trial", disabled=not ready)
-        submitted = st.form_submit_button("Submit this trial")
+    # ------------------- 提交按钮 -------------------
+    submitted = st.button("Submit this trial", disabled=not ready)
 
     if submitted:
         # 粗略反应时：从“允许作答”到提交
@@ -193,12 +193,10 @@ if st.session_state.demographics_done and st.session_state.trial_idx < len(st.se
             st.session_state.form_unlocked_time = st.session_state.trial_start_time + MIN_LISTEN_SECONDS
         rt_ms = int((time.time() - st.session_state.form_unlocked_time) * 1000)
 
-        heard = {
-            "Traffic": 000, "Birds/Nature": 000, "People/Talking": 000,
-            "Wind": 000, "Construction/Mechanical": 000, "Music": 000, "Other": 000
-        }
+        # 构建 heard dict
+        heard = {s: 0 for s in all_sound_types}
         for s in sound_types:
-            heard[s] = ratings[sound]
+            heard[s] = ratings.get(s, 0)
 
         row = [
             datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -209,8 +207,6 @@ if st.session_state.demographics_done and st.session_state.trial_idx < len(st.se
             stim["audio"],
             st.session_state.base_info["age"],
             st.session_state.base_info["gender"],
-            # st.session_state.base_info["used_headphones"],
-            # st.session_state.base_info["volume_selfreport"],
             float(comfort),
             float(pleasantness),
             float(match),
@@ -236,8 +232,3 @@ if st.session_state.demographics_done and st.session_state.trial_idx < len(st.se
         st.session_state.form_unlocked_time = None
         st.rerun()
 
-# ----------------- 结束页 -----------------
-if st.session_state.demographics_done and st.session_state.trial_idx >= len(st.session_state.trial_order):
-    st.subheader("All done — thank you!")
-    st.write("Your responses have been recorded.")
-    st.write(f"Participant ID: **{st.session_state.participant_id}**")
