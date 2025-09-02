@@ -196,10 +196,10 @@ if st.session_state.demographics_done and st.session_state.trial_idx < len(st.se
             float(pleasantness),
             float(match),
             heard["Traffic"],
-            heard["Birds/Nature"],
-            heard["People/Talking"],
+            heard["Birdsong"],
+            heard["People"],
             heard["Wind"],
-            heard["Construction/Mechanical"],
+            heard["Construction"],
             heard["Music"],
             heard["Other"],
             rt_ms
@@ -230,6 +230,7 @@ if st.session_state.demographics_done and st.session_state.trial_idx >= len(st.s
     st.subheader("All done — thank you!")
     st.write("Your responses have been recorded.")
     st.write(f"Participant ID: **{st.session_state.participant_id}**")
+
 
 
 
