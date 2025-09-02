@@ -158,56 +158,58 @@ if st.session_state.demographics_done and st.session_state.trial_idx < len(st.se
         st.info(f"Please listen to the sound for at least {MIN_LISTEN_SECONDS} seconds before answering.")
         st.progress(min(1.0, elapsed / MIN_LISTEN_SECONDS))
 
-    with st.form(key=f"form_trial_{i}"):
-        comfort = st.slider("Acoustic comfort (0–1)", 0.0, 1.0, 0.5, 0.01)
-        pleasantness = st.slider("Pleasantness (0–1)", 0.0, 1.0, 0.5, 0.01)
-        match = st.slider("Soundscape Appropriateness (0–1)", 0.0, 1.0, 0.5, 0.01)
+   with st.form(key=f"form_trial_{i}"):
+    comfort = st.slider("Acoustic comfort (0–1)", 0.0, 1.0, 0.5, 0.01)
+    pleasantness = st.slider("Pleasantness (0–1)", 0.0, 1.0, 0.5, 0.01)
+    match = st.slider("Soundscape Appropriateness (0–1)", 0.0, 1.0, 0.5, 0.01)
 
-        sound_types = st.multiselect(
-            "Which sound source types did you hear?",
-            ["Traffic", "Birds/Nature", "People/Talking", "Wind", "Construction/Mechanical", "Music", "Other"]
+    sound_types = st.multiselect(
+        "Which sound source types did you hear?",
+        ["Traffic", "Birds/Nature", "People/Talking", "Wind", "Construction/Mechanical", "Music", "Other"]
+    )
+
+    # 动态满意度评分
+    satisfaction_scores = {}
+    for s in sound_types:
+        satisfaction_scores[s] = st.slider(
+            f"Satisfaction with {s} (0–1)", 0.0, 1.0, 0.5, 0.01
         )
 
-        # 仅在 ready 时允许提交
-        # submitted = st.form_submit_button("Submit this trial", disabled=not ready)
-        submitted = st.form_submit_button("Submit this trial")
+    submitted = st.form_submit_button("Submit this trial")
 
-    if submitted:
-        # 粗略反应时：从“允许作答”到提交
-        if st.session_state.form_unlocked_time is None:
-            st.session_state.form_unlocked_time = st.session_state.trial_start_time + MIN_LISTEN_SECONDS
-        rt_ms = int((time.time() - st.session_state.form_unlocked_time) * 1000)
+if submitted:
+    if st.session_state.form_unlocked_time is None:
+        st.session_state.form_unlocked_time = st.session_state.trial_start_time + MIN_LISTEN_SECONDS
+    rt_ms = int((time.time() - st.session_state.form_unlocked_time) * 1000)
 
-        heard = {
-            "Traffic": 0, "Birds/Nature": 0, "People/Talking": 0,
-            "Wind": 0, "Construction/Mechanical": 0, "Music": 0, "Other": 0
-        }
-        for s in sound_types:
-            heard[s] = 1
+    # 记录 sound types 和满意度
+    heard = {s: 0 for s in ["Traffic","Birds/Nature","People/Talking","Wind","Construction/Mechanical","Music","Other"]}
+    satisfaction = {s: 0.0 for s in heard.keys()}
 
-        row = [
-            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            st.session_state.participant_id,
-            i,
-            stim["id"],
-            stim["image"],
-            stim["audio"],
-            st.session_state.base_info["age"],
-            st.session_state.base_info["gender"],
-            # st.session_state.base_info["used_headphones"],
-            # st.session_state.base_info["volume_selfreport"],
-            float(comfort),
-            float(pleasantness),
-            float(match),
-            heard["Traffic"],
-            heard["Birds/Nature"],
-            heard["People/Talking"],
-            heard["Wind"],
-            heard["Construction/Mechanical"],
-            heard["Music"],
-            heard["Other"],
-            rt_ms
-        ]
+    for s in sound_types:
+        heard[s] = 1
+        satisfaction[s] = float(satisfaction_scores.get(s, 0.0))
+
+    row = [
+        datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        st.session_state.participant_id,
+        i,
+        stim["id"],
+        stim["image"],
+        stim["audio"],
+        st.session_state.base_info["age"],
+        st.session_state.base_info["gender"],
+        float(comfort),
+        float(pleasantness),
+        float(match),
+        # 每个类型是否被听到
+        heard["Traffic"], heard["Birds/Nature"], heard["People/Talking"],
+        heard["Wind"], heard["Construction/Mechanical"], heard["Music"], heard["Other"],
+        # 每个类型的满意度
+        satisfaction["Traffic"], satisfaction["Birds/Nature"], satisfaction["People/Talking"],
+        satisfaction["Wind"], satisfaction["Construction/Mechanical"], satisfaction["Music"], satisfaction["Other"],
+        rt_ms
+    ]
 
         ok = append_row_with_retry(ws, row)
         if ok:
@@ -226,6 +228,7 @@ if st.session_state.demographics_done and st.session_state.trial_idx >= len(st.s
     st.subheader("All done — thank you!")
     st.write("Your responses have been recorded.")
     st.write(f"Participant ID: **{st.session_state.participant_id}**")
+
 
 
 
