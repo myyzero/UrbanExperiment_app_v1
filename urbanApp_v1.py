@@ -186,7 +186,8 @@ if st.session_state.demographics_done and st.session_state.trial_idx < len(st.se
 
     # ------------------- 提交按钮 -------------------
     # submitted = st.button("Submit this trial", disabled=not ready)
-    submitted = st.form_submit_button("Submit this trial")
+    
+    submitted = st.button("Submit this trial", disabled=not ready)
 
     if submitted:
         # 粗略反应时：从“允许作答”到提交
@@ -232,5 +233,6 @@ if st.session_state.demographics_done and st.session_state.trial_idx < len(st.se
         st.session_state.trial_start_time = None
         st.session_state.form_unlocked_time = None
         st.rerun()
+
 
 
