@@ -1,29 +1,24 @@
-# app.py
 import time
 import random
-import json
 from datetime import datetime
 
 import streamlit as st
-import pandas as pd
-
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from gspread.exceptions import APIError
 
 # ------------------- CONFIG -------------------
 GOOGLE_SHEET_NAME = "UrbanSoundscapeData"   # 你的 Google 表格名
-WORKSHEET_INDEX = 0                     # 第几个工作表（0 表示第一个）
+WORKSHEET_INDEX = 0                         # 第几个工作表（0 表示第一个）
 
-# 刺激库：自行替换为你的图片和音频文件（放在与 app.py 同目录）
 STIMULI = [
     {"id": "S01", "image": "i_qeop_3.jpg", "audio": "a_3_garden.wav"},
     {"id": "S02", "image": "i_qeop_2.jpg", "audio": "a_2_spring music.wav"},
     {"id": "S03", "image": "i_qeop_1.jpg", "audio": "a_1_east village.wav"},
 ]
 
-TRIALS_PER_PARTICIPANT = min(3, len(STIMULI))  # 每位受试的试次数
-MIN_LISTEN_SECONDS = 3                         # 最少收听时长门槛（无法检测音频结束，采用时间门槛替代）
+TRIALS_PER_PARTICIPANT = min(3, len(STIMULI))
+MIN_LISTEN_SECONDS = 3
 # ----------------------------------------------
 
 st.set_page_config(page_title="Soundscape Perception Test", page_icon="🎧", layout="centered")
@@ -31,21 +26,15 @@ st.set_page_config(page_title="Soundscape Perception Test", page_icon="🎧", la
 # -------------- Google Sheets 客户端 --------------
 @st.cache_resource(show_spinner=False)
 def get_gs_client():
-    """
-    优先从 st.secrets 加载凭据（适合云端部署），
-    本地无 secrets 则从 credentials.json 加载。
-    """
     scope = [
         "https://spreadsheets.google.com/feeds",
         "https://www.googleapis.com/auth/drive"
     ]
     try:
-        # 云端部署：从 secrets 加载
         if "gcp_service_account" in st.secrets:
             info = st.secrets["gcp_service_account"]
             creds = ServiceAccountCredentials.from_json_keyfile_dict(info, scope)
         else:
-            # 本地：从文件加载
             creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
         client = gspread.authorize(creds)
         return client
@@ -65,10 +54,8 @@ def append_row_with_retry(ws, row_values, max_retries=1):
         try:
             ws.append_row(row_values)
             return True
-        except APIError as e:
-            # 简单指数退避
-            wait = 2 ** i
-            time.sleep(wait)
+        except APIError:
+            time.sleep(2 ** i)
         except Exception as e:
             st.warning(f"Append failed (attempt {i+1}/{max_retries}): {e}")
             time.sleep(1)
@@ -81,7 +68,7 @@ def init_state():
     if "demographics_done" not in st.session_state:
         st.session_state.demographics_done = False
     if "trial_order" not in st.session_state:
-        order = STIMULI[:]  # 拷贝
+        order = STIMULI[:]
         random.shuffle(order)
         st.session_state.trial_order = order[:TRIALS_PER_PARTICIPANT]
     if "trial_idx" not in st.session_state:
@@ -98,7 +85,7 @@ ws = open_worksheet()
 st.title("Urban Soundscape & Visual Comfort Study")
 st.caption("Please wear headphones in a quiet environment.")
 
-# ---------------- Demographics（只填一次） ----------------
+# ---------------- Demographics ----------------
 if not st.session_state.demographics_done:
     st.subheader("Step 1: Consent & Setup")
 
@@ -110,26 +97,22 @@ if not st.session_state.demographics_done:
     colA, colB = st.columns(2)
     with colA:
         age = st.number_input("Age", min_value=18, max_value=100, step=1, value=25)
-        # used_headphones = st.selectbox("Are you using headphones?", ["", "Yes", "No"])
     with colB:
         gender = st.selectbox(
             "Gender",
             ["", "Female", "Male", "Non-binary", "Prefer not to say", "Other"]
         )
-        # volume_self = st.slider("Volume level (self-report, 0–1)", 0.0, 1.0, 0.7, 0.01)
+
     st.write(
         "Please put on your headphones and listen to the test audio. Adjust the volume to a level that is clear but not uncomfortable, and do not change the volume during the rest of the trials."
     )
-    st.audio("t_pinknoise.wav")  # 选配：放一个简短的校准音
+    st.audio("t_pinknoise.wav")
 
     disabled = not (consent and gender)
     if st.button("Begin trials", disabled=disabled):
-        # 把这些基础信息存住（每个 trial 都会用到）
         st.session_state.base_info = {
             "age": int(age),
             "gender": gender,
-            # "used_headphones": 1 if used_headphones == "Yes" else 0,
-            # "volume_selfreport": float(volume_self),
         }
         st.session_state.demographics_done = True
         st.rerun()
@@ -148,7 +131,6 @@ if st.session_state.demographics_done and st.session_state.trial_idx < len(st.se
     with col2:
         st.audio(stim["audio"])
 
-    # 记录 trial 开始时间 & 解锁时间（用于粗略控制最短收听时间）
     if st.session_state.trial_start_time is None:
         st.session_state.trial_start_time = time.time()
     elapsed = time.time() - st.session_state.trial_start_time
@@ -158,58 +140,56 @@ if st.session_state.demographics_done and st.session_state.trial_idx < len(st.se
         st.info(f"Please listen to the sound for at least {MIN_LISTEN_SECONDS} seconds before answering.")
         st.progress(min(1.0, elapsed / MIN_LISTEN_SECONDS))
 
-   with st.form(key=f"form_trial_{i}"):
-    comfort = st.slider("Acoustic comfort (0–1)", 0.0, 1.0, 0.5, 0.01)
-    pleasantness = st.slider("Pleasantness (0–1)", 0.0, 1.0, 0.5, 0.01)
-    match = st.slider("Soundscape Appropriateness (0–1)", 0.0, 1.0, 0.5, 0.01)
+    with st.form(key=f"form_trial_{i}"):
+        comfort = st.slider("Acoustic comfort (0–1)", 0.0, 1.0, 0.5, 0.01)
+        pleasantness = st.slider("Pleasantness (0–1)", 0.0, 1.0, 0.5, 0.01)
+        match = st.slider("Soundscape Appropriateness (0–1)", 0.0, 1.0, 0.5, 0.01)
 
-    sound_types = st.multiselect(
-        "Which sound source types did you hear?",
-        ["Traffic", "Birds/Nature", "People/Talking", "Wind", "Construction/Mechanical", "Music", "Other"]
-    )
-
-    # 动态满意度评分
-    satisfaction_scores = {}
-    for s in sound_types:
-        satisfaction_scores[s] = st.slider(
-            f"Satisfaction with {s} (0–1)", 0.0, 1.0, 0.5, 0.01
+        sound_types = st.multiselect(
+            "Which sound source types did you hear?",
+            ["Traffic", "Birds/Nature", "People/Talking", "Wind", "Construction/Mechanical", "Music", "Other"]
         )
 
-    submitted = st.form_submit_button("Submit this trial")
+        # 针对每种选择的声音，额外显示满意度
+        satisfaction = {}
+        for s in sound_types:
+            satisfaction[s] = st.slider(f"Satisfaction with {s} (0–1)", 0.0, 1.0, 0.5, 0.01, key=f"satis_{i}_{s}")
 
-if submitted:
-    if st.session_state.form_unlocked_time is None:
-        st.session_state.form_unlocked_time = st.session_state.trial_start_time + MIN_LISTEN_SECONDS
-    rt_ms = int((time.time() - st.session_state.form_unlocked_time) * 1000)
+        submitted = st.form_submit_button("Submit this trial")
 
-    # 记录 sound types 和满意度
-    heard = {s: 0 for s in ["Traffic","Birds/Nature","People/Talking","Wind","Construction/Mechanical","Music","Other"]}
-    satisfaction = {s: 0.0 for s in heard.keys()}
+    if submitted:
+        if st.session_state.form_unlocked_time is None:
+            st.session_state.form_unlocked_time = st.session_state.trial_start_time + MIN_LISTEN_SECONDS
+        rt_ms = int((time.time() - st.session_state.form_unlocked_time) * 1000)
 
-    for s in sound_types:
-        heard[s] = 1
-        satisfaction[s] = float(satisfaction_scores.get(s, 0.0))
+        heard = {s: 0 for s in ["Traffic", "Birds/Nature", "People/Talking", "Wind", "Construction/Mechanical", "Music", "Other"]}
+        satis_scores = {s: "" for s in heard.keys()}
 
-    row = [
-        datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        st.session_state.participant_id,
-        i,
-        stim["id"],
-        stim["image"],
-        stim["audio"],
-        st.session_state.base_info["age"],
-        st.session_state.base_info["gender"],
-        float(comfort),
-        float(pleasantness),
-        float(match),
-        # 每个类型是否被听到
-        heard["Traffic"], heard["Birds/Nature"], heard["People/Talking"],
-        heard["Wind"], heard["Construction/Mechanical"], heard["Music"], heard["Other"],
-        # 每个类型的满意度
-        satisfaction["Traffic"], satisfaction["Birds/Nature"], satisfaction["People/Talking"],
-        satisfaction["Wind"], satisfaction["Construction/Mechanical"], satisfaction["Music"], satisfaction["Other"],
-        rt_ms
-    ]
+        for s in sound_types:
+            heard[s] = 1
+            satis_scores[s] = float(satisfaction.get(s, ""))
+
+        row = [
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            st.session_state.participant_id,
+            i,
+            stim["id"],
+            stim["image"],
+            stim["audio"],
+            st.session_state.base_info["age"],
+            st.session_state.base_info["gender"],
+            float(comfort),
+            float(pleasantness),
+            float(match),
+            heard["Traffic"], satis_scores["Traffic"],
+            heard["Birds/Nature"], satis_scores["Birds/Nature"],
+            heard["People/Talking"], satis_scores["People/Talking"],
+            heard["Wind"], satis_scores["Wind"],
+            heard["Construction/Mechanical"], satis_scores["Construction/Mechanical"],
+            heard["Music"], satis_scores["Music"],
+            heard["Other"], satis_scores["Other"],
+            rt_ms
+        ]
 
         ok = append_row_with_retry(ws, row)
         if ok:
@@ -217,7 +197,6 @@ if submitted:
         else:
             st.error("❌ Failed to write to Google Sheets. You can retry by clicking 'Submit' again.")
 
-        # 准备下一试
         st.session_state.trial_idx += 1
         st.session_state.trial_start_time = None
         st.session_state.form_unlocked_time = None
@@ -228,16 +207,3 @@ if st.session_state.demographics_done and st.session_state.trial_idx >= len(st.s
     st.subheader("All done — thank you!")
     st.write("Your responses have been recorded.")
     st.write(f"Participant ID: **{st.session_state.participant_id}**")
-
-
-
-
-
-
-
-
-
-
-
-
-
