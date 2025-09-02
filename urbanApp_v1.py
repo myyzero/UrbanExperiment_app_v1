@@ -147,7 +147,7 @@ if st.session_state.demographics_done and st.session_state.trial_idx < len(st.se
     st.markdown("Acoustic comfort (0.00–1.00)")
     st.caption("What's your overall impression after viewing the image and listening to the sound?")
     comfort = st.slider("", 0.0, 1.0, 0.5, 0.01, key=f"comfort_{i}")
-    pleasantness = st.slider("Pleasantness (0.00–1.00)", 0.0, 1.0, 0.5, 0.01, key=f"pleasantness_{i}")
+    pleasantness = st.slider("Pleasantness (0.00–1.00)\n:gray[How you feel at this moment?]", 0.0, 1.0, 0.5, 0.01, key=f"pleasantness_{i}")
     match = st.slider("Soundscape Appropriateness (0.00–1.00)", 0.0, 1.0, 0.5, 0.01, key=f"match_{i}")
 
     all_sound_types = [
@@ -235,6 +235,7 @@ if st.session_state.demographics_done and st.session_state.trial_idx >= len(st.s
     st.subheader("All done — thank you!")
     st.write("Your responses have been recorded.")
     st.write(f"Participant ID: **{st.session_state.participant_id}**")
+
 
 
 
