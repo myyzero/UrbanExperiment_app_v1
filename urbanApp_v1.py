@@ -19,10 +19,10 @@ WORKSHEET_INDEX = 0                     # 第几个工作表（0 表示第一个
 STIMULI = [
     {"id": "S01", "image": "i_qeop_3.jpg", "audio": "a_3_garden.wav"},
     {"id": "S02", "image": "i_qeop_2.jpg", "audio": "a_2_spring music.wav"},
-    #{"id": "S03", "image": "img_highway.jpg", "audio": "snd_highway.mp3"},
+    {"id": "S03", "image": "i_qeop_1.jpg", "audio": "a_1_east village.wav"},
 ]
 
-TRIALS_PER_PARTICIPANT = min(2, len(STIMULI))  # 每位受试的试次数
+TRIALS_PER_PARTICIPANT = min(3, len(STIMULI))  # 每位受试的试次数
 MIN_LISTEN_SECONDS = 3                         # 最少收听时长门槛（无法检测音频结束，采用时间门槛替代）
 # ----------------------------------------------
 
@@ -226,6 +226,7 @@ if st.session_state.demographics_done and st.session_state.trial_idx >= len(st.s
     st.subheader("All done — thank you!")
     st.write("Your responses have been recorded.")
     st.write(f"Participant ID: **{st.session_state.participant_id}**")
+
 
 
 
