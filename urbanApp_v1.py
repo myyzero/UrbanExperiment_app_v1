@@ -25,7 +25,7 @@ TRIALS_PER_PARTICIPANT = min(3, len(STIMULI))  # 每位受试的试次数
 MIN_LISTEN_SECONDS = 3                         # 最少收听时长门槛
 # ----------------------------------------------
 
-st.set_page_config(page_title="Soundscape Perception Test", page_icon="🎧", layout="centered")
+st.set_page_config(page_title="Urban Acoustic Comfort Test", page_icon="🎧", layout="centered")
 
 # -------------- Google Sheets 客户端 --------------
 @st.cache_resource(show_spinner=False)
@@ -109,7 +109,7 @@ if not st.session_state.demographics_done:
         )
 
     st.write("Please put on your headphones and listen to the test audio and try not to adjust the volume again during the Trials.")
-    st.audio("t_pinknoise.wav")
+    st.audio("t_pinknoise_6s.wav")
 
     disabled = not (consent and gender)
     if st.button("Begin trials", disabled=disabled):
@@ -149,8 +149,8 @@ if st.session_state.demographics_done and st.session_state.trial_idx < len(st.se
     match = st.slider("Soundscape Appropriateness (0.00–1.00)", 0.0, 1.0, 0.5, 0.01, key=f"match_{i}")
 
     all_sound_types = [
-        "Traffic", "Birdsong", "People", "Wind",
-        "Construction", "Music", "Other"
+        "Birdsong", "Wind", "Water", 
+        "Human voice", "Car", "Bicycle", "Airplane/Helicopter", "Construction noise", "Music", "Other"
     ]
     sound_types = st.multiselect(
         "Which kinds of sound did you hear? (Select-all-that-apply)",
@@ -195,11 +195,14 @@ if st.session_state.demographics_done and st.session_state.trial_idx < len(st.se
             float(comfort),
             float(pleasantness),
             float(match),
-            heard["Traffic"],
             heard["Birdsong"],
-            heard["People"],
             heard["Wind"],
-            heard["Construction"],
+            heard["Water"],
+            heard["Human voice"],
+            heard["Car"],
+            heard["Bicycle"],
+            heard["Airplane/Helicopte"],
+            heard["Construction noise"],
             heard["Music"],
             heard["Other"],
             rt_ms
@@ -230,6 +233,7 @@ if st.session_state.demographics_done and st.session_state.trial_idx >= len(st.s
     st.subheader("All done — thank you!")
     st.write("Your responses have been recorded.")
     st.write(f"Participant ID: **{st.session_state.participant_id}**")
+
 
 
 
