@@ -149,11 +149,11 @@ if st.session_state.demographics_done and st.session_state.trial_idx < len(st.se
     match = st.slider("Soundscape Appropriateness (0.00–1.00)", 0.0, 1.0, 0.5, 0.01, key=f"match_{i}")
 
     all_sound_types = [
-        "Traffic", "Birds/Nature", "People/Talking", "Wind",
-        "Construction/Mechanical", "Music", "Other"
+        "Traffic", "Birdsong", "People", "Wind",
+        "Construction", "Music", "Other"
     ]
     sound_types = st.multiselect(
-        "Which sound source types did you hear?",
+        "Which sound source types did you hear? (Select-all-that-apply)",
         all_sound_types,
         key=f"multiselect_{i}"
     )
@@ -179,9 +179,9 @@ if st.session_state.demographics_done and st.session_state.trial_idx < len(st.se
             st.session_state.form_unlocked_time = st.session_state.trial_start_time + MIN_LISTEN_SECONDS
         rt_ms = int((time.time() - st.session_state.form_unlocked_time) * 1000)
 
-        heard = {s: 9 for s in all_sound_types}
+        heard = {s: N for s in all_sound_types}
         for s in sound_types:
-            heard[s] = ratings.get(s, 9)
+            heard[s] = ratings.get(s, N)
 
         row = [
             datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -230,5 +230,6 @@ if st.session_state.demographics_done and st.session_state.trial_idx >= len(st.s
     st.subheader("All done — thank you!")
     st.write("Your responses have been recorded.")
     st.write(f"Participant ID: **{st.session_state.participant_id}**")
+
 
 
