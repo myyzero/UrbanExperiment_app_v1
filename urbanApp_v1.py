@@ -140,7 +140,7 @@ if st.session_state.demographics_done and st.session_state.trial_idx < len(st.se
     ready = elapsed >= MIN_LISTEN_SECONDS
 
     if not ready:
-        st.info(f"Please listen to the sound for at least {MIN_LISTEN_SECONDS} seconds before answering.")
+        st.info(f"Please listen to the sound before answering.")
         st.progress(min(1.0, elapsed / MIN_LISTEN_SECONDS))
 
     # ------------------- 打分部分 -------------------
@@ -239,6 +239,7 @@ if st.session_state.demographics_done and st.session_state.trial_idx >= len(st.s
     st.subheader("All done — thank you!")
     st.write("Your responses have been recorded.")
     st.write(f"Participant ID: **{st.session_state.participant_id}**")
+
 
 
 
