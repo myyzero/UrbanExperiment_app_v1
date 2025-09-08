@@ -101,7 +101,7 @@ if not st.session_state.demographics_done:
 
     colA, colB = st.columns(2)
     with colA:
-        age = st.number_input("Age", min_value=18, max_value=100, step=1, value=25)
+        age = st.number_input("Age", min_value=1, max_value=100, step=1, value=25)
     with colB:
         gender = st.selectbox(
             "Gender",
@@ -239,6 +239,7 @@ if st.session_state.demographics_done and st.session_state.trial_idx >= len(st.s
     st.subheader("All done — thank you!")
     st.write("Your responses have been recorded.")
     st.write(f"Participant ID: **{st.session_state.participant_id}**")
+
 
 
 
